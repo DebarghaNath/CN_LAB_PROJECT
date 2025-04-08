@@ -1,81 +1,112 @@
-// Includes core functionalities like simulation time, event scheduling, logging, and command-line argument parsing
 #include "ns3/core-module.h"
-// Includes basic network components like Node, NetDevice, Packet, and helpers to create and manage nodes/devices
 #include "ns3/network-module.h"
-// Includes the Internet protocol stack (TCP/IP), IP address assignment, and routing functionalities
 #include "ns3/internet-module.h"
-// Includes the PointToPointHelper class to create point-to-point (wired) links between two nodes with defined bandwidth and delay
 #include "ns3/point-to-point-module.h"
-// Includes standard application-level traffic generators like UDP Echo Server/Client, OnOffApplication, PacketSink, etc.
 #include "ns3/applications-module.h"
+#include "ns3/traffic-control-module.h"
+#include "ns3/flow-monitor-module.h"
+#include "ns3/ipv4-flow-classifier.h"
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE("SimpleNetwork");
+NS_LOG_COMPONENT_DEFINE("TcpDetailedStats");
+
+uint32_t latestCwnd = 0;
+
+void CwndTracer(uint32_t oldCwnd, uint32_t newCwnd) {
+    latestCwnd = newCwnd;
+}
+
+void CollectDetailedStats(Ptr<FlowMonitor> monitor, FlowMonitorHelper& flowHelper, Ipv4Address h1Addr, Ipv4Address h2Addr, std::ofstream& statsFile) {
+    monitor->CheckForLostPackets();
+    Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier>(flowHelper.GetClassifier());
+    auto stats = monitor->GetFlowStats();
+
+    for (auto &flow : stats) {
+        auto t = classifier->FindFlow(flow.first);
+        if (t.sourceAddress == h1Addr && t.destinationAddress == h2Addr) {
+            double durationSec = flow.second.timeLastRxPacket.GetSeconds() - flow.second.timeFirstTxPacket.GetSeconds();
+            double throughputMbps = (flow.second.rxBytes * 8.0) / (durationSec * 1e6);
+            double avgDelayMs = (flow.second.rxPackets > 0) ? (flow.second.delaySum.GetSeconds() / flow.second.rxPackets) * 1000.0 : 0.0;
+            uint32_t packetLoss = flow.second.txPackets - flow.second.rxPackets;
+
+            std::stringstream ss;
+            ss << "Flow " << t.sourceAddress << " → " << t.destinationAddress
+               << " | Throughput: " << throughputMbps << " Mbps"
+               << " | Avg Delay: " << avgDelayMs << " ms"
+               << " | Packet Loss: " << packetLoss
+               << " | CWND: " << latestCwnd;
+
+            NS_LOG_INFO(ss.str());
+            statsFile << ss.str() << std::endl;
+        }
+    }
+}
 
 int main(int argc, char *argv[]) {
-    LogComponentEnable("SimpleNetwork", LOG_LEVEL_INFO);
+    LogComponentEnable("TcpDetailedStats", LOG_LEVEL_INFO);
+    std::ofstream statsFile("/Users/debar/Desktop/stats.txt", std::ios::out | std::ios::app);
 
-    NS_LOG_INFO("Hello NS-3 Simulation");
+    std::srand(std::time(nullptr));
 
-  // Create 3 nodes: Host A, Router, Host B
-  NodeContainer nodesAtoR;
-  nodesAtoR.Create(2); // Host A (0), Router (1)
+    for (int i = 0; i < 100; ++i) {
+        latestCwnd = 0;
+        NodeContainer hosts;
+        hosts.Create(2);
 
-  NodeContainer nodesRtoB;
-  nodesRtoB.Add(nodesAtoR.Get(1)); // Router
-  nodesRtoB.Create(1); // Host B (2)
+        PointToPointHelper p2p;
+        std::string rate = std::to_string(8 + std::rand() % 5) + "Mbps"; // 8-12Mbps
+        std::string delay = std::to_string(5 + std::rand() % 6) + "ms";   // 5-10ms
+        p2p.SetDeviceAttribute("DataRate", StringValue(rate));
+        p2p.SetChannelAttribute("Delay", StringValue(delay));
+        p2p.SetQueue("ns3::DropTailQueue<Packet>", "MaxSize", StringValue("100p"));
 
-  // Create point-to-point links
-  PointToPointHelper p2p;
-  p2p.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
-  p2p.SetChannelAttribute("Delay", StringValue("2ms"));
+        NetDeviceContainer devices = p2p.Install(hosts);
 
-  // Install network devices on the links
-  NetDeviceContainer devAtoR = p2p.Install(nodesAtoR);
-  NetDeviceContainer devRtoB = p2p.Install(nodesRtoB);
+        InternetStackHelper stack;
+        stack.Install(hosts);
 
-  // Install the Internet stack on all nodes
-  InternetStackHelper stack;
-  stack.Install(nodesAtoR);
-  stack.Install(nodesRtoB.Get(1)); // Only install on Host B (Router already has it)
+        Ipv4AddressHelper address;
+        address.SetBase("10.0.0.0", "255.255.255.0");
+        Ipv4InterfaceContainer interfaces = address.Assign(devices);
+        Ipv4Address h1Addr = interfaces.GetAddress(0);
+        Ipv4Address h2Addr = interfaces.GetAddress(1);
 
-  // Assign IP addresses to the interfaces
-  Ipv4AddressHelper address;
+        uint16_t port = 5001;
+        Address sinkAddr(InetSocketAddress(h2Addr, port));
+        PacketSinkHelper sinkHelper("ns3::TcpSocketFactory", sinkAddr);
+        auto sinkApp = sinkHelper.Install(hosts.Get(1));
+        sinkApp.Start(Seconds(0.0));
+        sinkApp.Stop(Seconds(60.0));
 
-  address.SetBase("10.1.1.0", "255.255.255.0");
-  Ipv4InterfaceContainer ifaceAtoR = address.Assign(devAtoR);
+        BulkSendHelper sourceHelper("ns3::TcpSocketFactory", sinkAddr);
+        sourceHelper.SetAttribute("MaxBytes", UintegerValue(0));
+        sourceHelper.SetAttribute("SendSize", UintegerValue(1024));
+        ApplicationContainer clientApp = sourceHelper.Install(hosts.Get(0));
+        clientApp.Start(Seconds(1.0));
+        clientApp.Stop(Seconds(60.0));
 
-  address.SetBase("10.1.2.0", "255.255.255.0");
-  Ipv4InterfaceContainer ifaceRtoB = address.Assign(devRtoB);
+        Simulator::Schedule(Seconds(1.1), [&]() {
+            Ptr<BulkSendApplication> appPtr = DynamicCast<BulkSendApplication>(clientApp.Get(0));
+            Ptr<Socket> socket = appPtr->GetSocket();
+            if (socket) {
+                socket->TraceConnectWithoutContext("CongestionWindow", MakeCallback(&CwndTracer));
+            }
+        });
 
-  // Set up routing tables automatically
-  Ipv4GlobalRoutingHelper::PopulateRoutingTables();
+        FlowMonitorHelper flowHelper;
+        Ptr<FlowMonitor> monitor = flowHelper.InstallAll();
 
-  // Install an Echo Server on Host B
-  uint16_t port = 9;
-  UdpEchoServerHelper echoServer(port);
-  ApplicationContainer serverApp = echoServer.Install(nodesRtoB.Get(1));
-  serverApp.Start(Seconds(1.0));
-  serverApp.Stop(Seconds(10.0));
+        Simulator::Stop(Seconds(61.0));
+        Simulator::Run();
 
-  // Install an Echo Client on Host A
-  UdpEchoClientHelper echoClient(ifaceRtoB.GetAddress(1), port);
-  echoClient.SetAttribute("MaxPackets", UintegerValue(1));
-  echoClient.SetAttribute("Interval", TimeValue(Seconds(1.0)));
-  echoClient.SetAttribute("PacketSize", UintegerValue(1024));
+        CollectDetailedStats(monitor, flowHelper, h1Addr, h2Addr, statsFile);
+        Simulator::Destroy();
+    }
 
-  ApplicationContainer clientApp = echoClient.Install(nodesAtoR.Get(0));
-  clientApp.Start(Seconds(2.0));
-  clientApp.Stop(Seconds(10.0));
-    NS_LOG_INFO("Host A IP Address: " << ifaceAtoR.GetAddress(0));
-NS_LOG_INFO("Router IP Address (A side): " << ifaceAtoR.GetAddress(1));
-NS_LOG_INFO("Router IP Address (B side): " << ifaceRtoB.GetAddress(0));
-NS_LOG_INFO("Host B IP Address: " << ifaceRtoB.GetAddress(1));
-
-  // Run the simulation
-  Simulator::Run();
-  Simulator::Destroy();
-
-  return 0;
+    statsFile.close();
+    return 0;
 }
