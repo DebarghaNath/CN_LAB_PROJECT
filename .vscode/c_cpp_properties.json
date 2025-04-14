@@ -3,7 +3,10 @@
     {
       "name": "macos-clang-arm64",
       "includePath": [
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/**",
+        "/Users/debar/ns-3-allinone/ns-3-dev/build/include"
+
+
       ],
       "compilerPath": "/usr/bin/clang",
       "cStandard": "${default}",

@@ -1,0 +1,136 @@
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 2185
+  Rx Packets: 2068
+  Lost Packets: 117
+  Delay: 115.234 s
+  Jitter: 0.000528592 s
+  Throughput: 9.69694 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 4311
+  Rx Packets: 4187
+  Lost Packets: 124
+  Delay: 233.355 s
+  Jitter: 0.000499951 s
+  Throughput: 9.83155 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 6376
+  Rx Packets: 6305
+  Lost Packets: 71
+  Delay: 302.16 s
+  Jitter: 0.000488091 s
+  Throughput: 9.87639 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 8506
+  Rx Packets: 8424
+  Lost Packets: 82
+  Delay: 375.824 s
+  Jitter: 0.000484044 s
+  Throughput: 9.89882 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 10636
+  Rx Packets: 10543
+  Lost Packets: 93
+  Delay: 460.325 s
+  Jitter: 0.000481623 s
+  Throughput: 9.91228 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 12763
+  Rx Packets: 12661
+  Lost Packets: 102
+  Delay: 554.604 s
+  Jitter: 0.000480013 s
+  Throughput: 9.92125 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 14889
+  Rx Packets: 14780
+  Lost Packets: 109
+  Delay: 657.47 s
+  Jitter: 0.000478864 s
+  Throughput: 9.92766 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 17017
+  Rx Packets: 16898
+  Lost Packets: 119
+  Delay: 768.158 s
+  Jitter: 0.000478004 s
+  Throughput: 9.93246 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 19126
+  Rx Packets: 19017
+  Lost Packets: 109
+  Delay: 886.721 s
+  Jitter: 0.000477335 s
+  Throughput: 9.9362 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 21209
+  Rx Packets: 21136
+  Lost Packets: 73
+  Delay: 952.157 s
+  Jitter: 0.000476063 s
+  Throughput: 9.93919 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 23339
+  Rx Packets: 23254
+  Lost Packets: 85
+  Delay: 1026.54 s
+  Jitter: 0.000475693 s
+  Throughput: 9.94164 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 25467
+  Rx Packets: 25373
+  Lost Packets: 94
+  Delay: 1111.68 s
+  Jitter: 0.000475385 s
+  Throughput: 9.94368 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 27596
+  Rx Packets: 27492
+  Lost Packets: 104
+  Delay: 1206.59 s
+  Jitter: 0.000475124 s
+  Throughput: 9.9454 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 29722
+  Rx Packets: 29610
+  Lost Packets: 112
+  Delay: 1309.91 s
+  Jitter: 0.0004749 s
+  Throughput: 9.94688 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 31848
+  Rx Packets: 31729
+  Lost Packets: 119
+  Delay: 1421.16 s
+  Jitter: 0.000474707 s
+  Throughput: 9.94816 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 33908
+  Rx Packets: 33848
+  Lost Packets: 60
+  Delay: 1539.46 s
+  Jitter: 0.000474077 s
+  Throughput: 9.94928 Mbps
+
+Flow ID: 1 (10.1.1.1 -> 10.1.2.2)
+  Tx Packets: 36042
+  Rx Packets: 35966
+  Lost Packets: 76
+  Delay: 1602.17 s
+  Jitter: 0.000473955 s
+  Throughput: 9.95027 Mbps
+
