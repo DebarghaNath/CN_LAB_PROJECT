@@ -4,7 +4,8 @@
       "name": "macos-clang-arm64",
       "includePath": [
         "${workspaceFolder}/**",
-        "/Users/debar/ns-3-allinone/ns-3-dev/build/include"
+        "/Users/debar/ns-3-allinone/ns-3-dev/build/include",
+        "/Users/debar/ns-3-allinone/ns-3-dev/src/**"
 
 
       ],
