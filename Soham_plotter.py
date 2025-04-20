@@ -10,7 +10,7 @@ cwnd_vals = []
 with open("/Users/debar/Desktop/CN_LAB_PROJECT/log_stats.txt", "r") as file:
     for line in file:
         # Match the pattern using regular expressions
-        match = re.search(r"Time:\s*([\d.]+)\s*s,\s*Throughput:\s*([\d.]+)\s*Mbps,\s*cwnd:\s*(\d+)\s*bytes", line)
+        match = re.search(r"Time:\s*([\d.]+)\s*s,\s*Throughput:\s*([\d.]+)\s*Mbps,\s*cwnd:\s*(\d+)\s*segments", line)
         if match:
             time = float(match.group(1))
             throughput = float(match.group(2))
