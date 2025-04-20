@@ -14,7 +14,7 @@ using namespace ns3;
 using namespace std;
 
 // Optimization parameters
-double a = 2, b = 0, c = 0.5 , d = 0;
+double a = 1, b = 0, c = 0.5 , d = 0;
 const double eps_a = 0.1, eps_b = 1, eps_c = 1, eps_d = 10; 
 
 // number of iterations
