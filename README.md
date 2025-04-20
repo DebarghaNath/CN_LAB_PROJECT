@@ -12,3 +12,4 @@ cmake --build . --target scratch_first-sim
 /Users/debar/ns-3-allinone/ns-3-dev/build/scratch/ns3-dev-first-sim-default
 cd ~/ns-3-allinone/ns-3-dev/cmake-cache
 
+./ns3 run scratch/project
