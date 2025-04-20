@@ -27,9 +27,11 @@ const double learning_rate = 1;
 const double alpha = 0, Beta = 1, Gamma = 0; // Coefficients
 const double scale_1 = 1, scale_2 = 1, scale_3 = 1; // Normalization
 
+// During simulation
+const int runtime = 20;       // Seconds for which the simulation runs
 ApplicationContainer sinkApp;
-bool slow_start;
-double Throughput;
+bool slow_start;              // Checks if it is still in slow start phase
+double Throughput;            // Throughput after slow start
 
 double getThroughput(){
     return DynamicCast<PacketSink>(sinkApp.Get(0))->GetTotalRx() / 1e6;
@@ -114,7 +116,6 @@ double run(){
     Ipv4InterfaceContainer interfaces = address.Assign(devices);
 
     int port = 5000;
-    const int runtime = 20; // Seconds for which each simulation runs
 
     // Install sink on receiver
     PacketSinkHelper sinkHelper("ns3::TcpSocketFactory", InetSocketAddress(Ipv4Address::GetAny(), port));
@@ -149,7 +150,7 @@ int main(int argc, char *argv[]) {
 
     cout << fixed << setprecision(6);
 
-    cout << 0 << ": " << " a: " << a << ", b: " << b << ", c: " << c << ", d: " << d
+    cout << 0 << " -> " << " a: " << a << ", b: " << b << ", c: " << c << ", d: " << d
          << ", CM: " << -run() << endl;
 
     for(int i=1;i<=iterations;i++){
@@ -187,7 +188,7 @@ int main(int argc, char *argv[]) {
 
         d -= learning_rate * dcm_dd;
 
-        cout << i << ": " << " a: " << a << ", b: " << b << ", c: " << c << ", d: " << d
+        cout << i << " -> " << " a: " << a << ", b: " << b << ", c: " << c << ", d: " << d
              << ", CM: " << -CM << endl;
     }
 
