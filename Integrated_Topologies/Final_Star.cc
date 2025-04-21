@@ -62,7 +62,6 @@ class CustomTcp : public TcpNewReno {
             else{
                 if(slow_start){
                     slow_start = false;
-                    cout<<"HELLO"<<endl;
                     Throughput = -getThroughput(); // Remove the slow start portion
                 }
                 // Additive increase
@@ -76,14 +75,8 @@ class CustomTcp : public TcpNewReno {
         // On loss
         void CongestionStateSet(Ptr<TcpSocketState> tcb, const TcpSocketState::TcpCongState_t newState) override {
             TcpNewReno::CongestionStateSet(tcb, newState);
-            if (newState == TcpSocketState::CA_RECOVERY) 
-            {
+            if (newState == TcpSocketState::CA_RECOVERY){
                 tcb->m_cWnd = static_cast<uint32_t>(max(1.0,tcb->m_cWnd.Get() * c + d * tcb->m_segmentSize));
-                cout<<"CA_RECOVERY"<<endl;
-            }
-            else
-            {
-                cout<<"CA_LOSS"<<endl;
             }
             // lastCwnd = static_cast<uint32_t>(tcb->m_cWnd.Get() / tcb->m_segmentSize);
         }
@@ -147,7 +140,9 @@ double run(){
 
     // Calcluate and return Congestion Metric
     Throughput += getThroughput();
-    double CM = alpha*0/scale_1 - Beta*Throughput/scale_2 + Gamma*0/scale_3;
+    double Delay = 10;
+    double Jitter = 0;
+    double CM = alpha*Delay/scale_1 - Beta*Throughput/scale_2 + Gamma*Jitter/scale_3;
 
     Simulator::Destroy();
 
