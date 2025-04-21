@@ -15,13 +15,13 @@ using namespace std;
 
 // Optimization parameters
 double a = 1, b = 0, c = 0.5 , d = 0;
-const double eps_a = 0.1, eps_b = 1, eps_c = 1, eps_d = 10; 
+const double eps_a = 1, eps_b = 10, eps_c = 1, eps_d = 10; 
+
+// For gradient descent
+const double learning_rate = 3;
 
 // number of iterations
 const int iterations = 100;
-
-// For gradient descent
-const double learning_rate = 1;
 
 // Loss function / Congestion metric
 const double alpha = 0, Beta = 1, Gamma = 0; // Coefficients
