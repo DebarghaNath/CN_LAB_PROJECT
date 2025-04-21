@@ -71,10 +71,6 @@ int main(int argc, char *argv[])
         address.NewNetwork();
     }
     uint16_t port = 5000;
-    PacketSinkHelper sinkHelper("ns3::TcpSocketFactory",InetSocketAddress(Ipv4Address::GetAny(), port));
-    sinkApp = sinkHelper.Install(nodes.Get(nodes.GetN() - 1));
-    sinkApp.Start(Seconds(0.0));
-    sinkApp.Stop(Seconds(61.0));
 
     BulkSendHelper bulk("ns3::TcpSocketFactory",InetSocketAddress(interfaces.back().GetAddress(1), port));
     bulk.SetAttribute("MaxBytes", UintegerValue(0)); 
