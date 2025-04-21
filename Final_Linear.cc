@@ -99,7 +99,6 @@ double run(){
 
     NodeContainer nodes;
     nodes.Create(10);
-
     InternetStackHelper stack;
     stack.Install(nodes);
 
@@ -123,7 +122,7 @@ double run(){
 
     // Install sink on receiver
     PacketSinkHelper sinkHelper("ns3::TcpSocketFactory",InetSocketAddress(Ipv4Address::GetAny(), port));
-    sinkApp = sinkHelper.Install(nodes.Get(nodes.GetN() - 1));
+    sinkApp = sinkHelper.Install(nodes.Get(nodes.GetN()-1));
     sinkApp.Start(Seconds(0.0));
     sinkApp.Stop(Seconds(runtime));
     
