@@ -15,14 +15,7 @@ using namespace std;
 
 // Optimization parameters
 double a = 1, b = 0, c = 0.5 , d = 0;
-// For gradient calculation
-double dcm_da,dcm_db,dcm_dc,dcm_dd;
-double learning_rate = 0.1;
 double lastTotalTP = 0;
-// Loss function / Congestion metric
-double alpha = 0, beta = 1, Gamma = 0; // Coefficients
-double scale_1, scale_2, scale_3; // Normalization
-double CM;
 
 ofstream logFile;
 uint32_t lastCwnd = 0;
@@ -45,31 +38,6 @@ void ThroughputTracer(Ptr<Application> app) {
             << lastCwnd << " segments " << endl;
 
     Simulator::Schedule(MilliSeconds(10), &ThroughputTracer, app); // Every 10ms
-}
-
-void gradient(){
-    double curTotalTP = prevThroughput;
-    double TP1 = curTotalTP - lastTotalTP;
-
-}
-
-void UpdateParameters(){
-    // gradient();
-
-    // lastTotalTP = prevThroughput;
-
-    // a -= learning_rate * dcm_da;
-    // a = max(0.1,a);
-    // b -= learning_rate * dcm_db;
-    // c -= learning_rate * dcm_dc;
-    // c = max(0.001,c);
-    // c = min(1.0,c);
-    // d -= learning_rate * dcm_dd;
-    
-    // logFile << "Time: " << curTime.GetMinutes() << " min, a: "<< a << ", b: " << b
-    //         << ", c: " <<c << ", d: " << d << endl;
-
-    // Simulator::Schedule(Minutes(0.5), &UpdateParameters); // Every 30sec
 }
 
 class CustomTcp : public TcpNewReno {
@@ -107,7 +75,7 @@ class CustomTcp : public TcpNewReno {
         void CongestionStateSet(Ptr<TcpSocketState> tcb, const TcpSocketState::TcpCongState_t newState) override {
             TcpNewReno::CongestionStateSet(tcb, newState);
             if (newState == TcpSocketState::CA_RECOVERY) {
-                tcb->m_cWnd = static_cast<uint32_t>(max(1.0,tcb->m_cWnd.Get() * c + d * tcb->segmentSize));
+                tcb->m_cWnd = static_cast<uint32_t>(max(1.0,tcb->m_cWnd.Get() * c + d * tcb->m_segmentSize));
             }
             lastCwnd = static_cast<uint32_t>(tcb->m_cWnd.Get() / tcb->m_segmentSize);
         }
@@ -175,9 +143,6 @@ int main(int argc, char *argv[]) {
 
     // Start throughput measurement
     Simulator::Schedule(Seconds(1.0), &ThroughputTracer, sinkApp.Get(0));
-    
-    // Update parameters every 30 sec
-    Simulator::Schedule(Minutes(0.5), &UpdateParameters);
 
     Simulator::Stop(Minutes(1));
     Simulator::Run();
