@@ -76,7 +76,7 @@ class CustomTcp : public TcpNewReno {
         // On loss
         void CongestionStateSet(Ptr<TcpSocketState> tcb, const TcpSocketState::TcpCongState_t newState) override {
             TcpNewReno::CongestionStateSet(tcb, newState);
-            if (newState == TcpSocketState::CA_LOSS) {
+            if (newState == TcpSocketState::CA_RECOVERY) {
                 tcb->m_cWnd = static_cast<uint32_t>(max(1.0,tcb->m_cWnd.Get() * c + d * tcb->m_segmentSize));
             }
             // lastCwnd = static_cast<uint32_t>(tcb->m_cWnd.Get() / tcb->m_segmentSize);
@@ -104,7 +104,7 @@ double run(){
     stack.Install(nodes);
 
     PointToPointHelper p2p;
-    p2p.SetDeviceAttribute("DataRate", StringValue("10Mbps"));
+    p2p.SetDeviceAttribute("DataRate", StringValue("2Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("10ms"));
     p2p.SetQueue("ns3::DropTailQueue", "MaxSize", QueueSizeValue(QueueSize("10p")));
 

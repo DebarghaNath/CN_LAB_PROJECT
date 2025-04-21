@@ -4,7 +4,7 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/drop-tail-queue.h"
-#include "ns3/tcp-cubic.h"
+#include "ns3/tcp-cubic.h"  
 #include "ns3/tcp-vegas.h"
 
 #include <iomanip>
@@ -75,7 +75,7 @@ class CustomTcp : public TcpNewReno {
         // On loss
         void CongestionStateSet(Ptr<TcpSocketState> tcb, const TcpSocketState::TcpCongState_t newState) override {
             TcpNewReno::CongestionStateSet(tcb, newState);
-            if (newState == TcpSocketState::CA_LOSS) {
+            if (newState == TcpSocketState::CA_RECOVERY) {
                 tcb->m_cWnd = static_cast<uint32_t>(max(1.0,tcb->m_cWnd.Get() * c + d * tcb->m_segmentSize));
             }
             // lastCwnd = static_cast<uint32_t>(tcb->m_cWnd.Get() / tcb->m_segmentSize);
