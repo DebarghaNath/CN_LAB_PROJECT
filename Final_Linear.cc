@@ -99,6 +99,7 @@ double run(){
 
     NodeContainer nodes;
     nodes.Create(10);
+
     InternetStackHelper stack;
     stack.Install(nodes);
 
@@ -110,9 +111,9 @@ double run(){
     Ipv4AddressHelper address;
     address.SetBase("10.1.1.0", "255.255.255.0");
     vector<Ipv4InterfaceContainer> interfaces;
-    for (uint32_t i = 0; i < nodes.GetN(); ++i)
+    for (uint32_t i = 0; i < nodes.GetN() - 1; ++i)
     {
-        NodeContainer pair(nodes.Get(i), nodes.Get((i + 1) % nodes.GetN()));
+        NodeContainer pair(nodes.Get(i), nodes.Get(i + 1));
         auto ndc = p2p.Install(pair);
         interfaces.push_back(address.Assign(ndc));
         address.NewNetwork();
