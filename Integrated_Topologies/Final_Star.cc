@@ -18,7 +18,7 @@ double a = 1, b = 0, c = 0.5 , d = 0;
 const double eps_a = 1, eps_b = 10, eps_c = 1, eps_d = 10; 
 
 // For gradient descent
-const double learning_rate = 3;
+const double learning_rate = 1;
 
 // number of iterations
 const int iterations = 100;
@@ -105,7 +105,7 @@ double run(){
     PointToPointHelper p2p;
     p2p.SetDeviceAttribute("DataRate", StringValue("2Mbps"));
     p2p.SetChannelAttribute("Delay", StringValue("10ms"));
-    p2p.SetQueue("ns3::DropTailQueue", "MaxSize", QueueSizeValue(QueueSize("1p")));
+    p2p.SetQueue("ns3::DropTailQueue", "MaxSize", QueueSizeValue(QueueSize("10p")));
 
     Ipv4AddressHelper address;
     address.SetBase("10.1.1.0", "255.255.255.0");
