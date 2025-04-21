@@ -7,7 +7,7 @@ throughput_vals = []
 cwnd_vals = []
 
 # Open and read the log file
-with open("/Users/debar/Desktop/CN_LAB_PROJECT/log_stats.txt", "r") as file:
+with open("log_stats.txt", "r") as file:
     for line in file:
         # Match the pattern using regular expressions
         match = re.search(r"Time:\s*([\d.]+)\s*s,\s*Throughput:\s*([\d.]+)\s*Mbps,\s*cwnd:\s*(\d+)\s*segments", line)
@@ -26,7 +26,7 @@ plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
 plt.plot(time_vals, cwnd_vals, label="cwnd", color="blue")
 plt.xlabel("Time (s)")
-plt.ylabel("cwnd (KB)")
+plt.ylabel("cwnd (segments)")
 plt.title("cwnd vs Time")
 plt.grid(True)
 
