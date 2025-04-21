@@ -140,7 +140,9 @@ double run(){
 
     // Calcluate and return Congestion Metric
     Throughput += getThroughput();
-    double CM = alpha*0/scale_1 - Beta*Throughput/scale_2 + Gamma*0/scale_3;
+    double Delay = 10;
+    double Jitter = 0;
+    double CM = alpha*Delay/scale_1 - Beta*Throughput/scale_2 + Gamma*Jitter/scale_3;
 
     Simulator::Destroy();
 
