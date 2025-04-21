@@ -137,7 +137,6 @@ double run(bool _print = false){
     Ipv4AddressHelper address;
     address.SetBase("10.1.1.0", "255.255.255.0");
     vector<Ipv4InterfaceContainer> interfaces;
-    vector<Ipv4InterfaceContainer> interfaces;
     uint32_t n = nodes.GetN();
     for (uint32_t parent = 0; parent < n; ++parent)
     { 
@@ -159,6 +158,10 @@ double run(bool _print = false){
     sinkApp.Start(Seconds(0.0));
     sinkApp.Stop(Seconds(runtime));
     
+    // Jitter calculation
+    sinkApp.Get(0)->GetObject<PacketSink>()->TraceConnectWithoutContext(
+        "Rx", MakeCallback(&PacketReceivedCallback));    
+
     // Delay BulkSender installation and start
     Simulator::Schedule(Seconds(0.000001), [&]() mutable {
         BulkSendHelper bulk("ns3::TcpSocketFactory",InetSocketAddress(interfaces[4].GetAddress(1), port));
