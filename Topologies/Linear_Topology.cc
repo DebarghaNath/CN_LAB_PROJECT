@@ -4,7 +4,7 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/tcp-linux-reno.h"
-
+#include "ns3/flow-monitor-module.h"
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -18,6 +18,9 @@ static uint32_t lastCwnd = 0;
 static double prevThroughput = 0.0;
 static Time prevTime;
 static ApplicationContainer sinkApp;
+
+FlowMonitorHelper flowmonhelper;
+Ptr<FlowMonitor> monitor = flowmonhelper.InstallAll();
 
 void CwndTracer(uint32_t oldCwnd, uint32_t newCwnd)
 {
@@ -94,6 +97,21 @@ int main(int argc, char *argv[])
     Simulator::Schedule(Seconds(1.1), &ThroughputTracer,DynamicCast<PacketSink>(sinkApp.Get(0)));
     Simulator::Stop(Seconds(61.0));
     Simulator::Run();
+    
+    Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier> (flowmonhelper.GetClassifier ());
+    map<FlowId, FlowMonitor::FlowStats> stats = monitor->GetFlowStats ();
+    for (auto &flow : stats)
+    {
+        FlowId flowId = flow.first;
+        Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow (flowId);
+        FlowMonitor::FlowStats st = flow.second;
+        cout << "Flow " << flowId << " (" << t.sourceAddress << " → " << t.destinationAddress << ")\n";
+        cout << "  Tx Packets:   " << st.txPackets << "\n";
+        cout << "  Rx Packets:   " << st.rxPackets << "\n";
+        cout << "  Throughput:   "<< (st.rxBytes * 8.0 / (st.timeLastRxPacket.GetSeconds()  - st.timeFirstTxPacket.GetSeconds()) / 1e6)<< " Mbps\n";
+        cout << "  Delay Sum:    " << st.delaySum.GetSeconds() << " s\n";
+        cout << "  Jitter Sum:   " << st.jitterSum.GetSeconds() << " s\n\n";
+}
     Simulator::Destroy();
 
     logFile.close();

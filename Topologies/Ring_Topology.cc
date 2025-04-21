@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
     uint16_t port = 5000;
     PacketSinkHelper sinkHelper("ns3::TcpSocketFactory",InetSocketAddress(Ipv4Address::GetAny(), port));
-    sinkApp = sinkHelper.Install(nodes.Get(nodes/2));
+    sinkApp = sinkHelper.Install(nodes.Get(5));
     sinkApp.Start(Seconds(0.0));
     sinkApp.Stop(Seconds(61.0));
 

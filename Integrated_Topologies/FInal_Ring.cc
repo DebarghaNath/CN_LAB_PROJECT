@@ -110,9 +110,9 @@ double run(){
     Ipv4AddressHelper address;
     address.SetBase("10.1.1.0", "255.255.255.0");
     vector<Ipv4InterfaceContainer> interfaces;
-    for (uint32_t i = 0; i < nodes.GetN() - 1; ++i)
+    for (uint32_t i = 0; i < nodes.GetN()-1; ++i)
     {
-        NodeContainer pair(nodes.Get(i), nodes.Get(i + 1));
+        NodeContainer pair(nodes.Get(i), nodes.Get((i + 1) % nodes.GetN()));
         auto ndc = p2p.Install(pair);
         interfaces.push_back(address.Assign(ndc));
         address.NewNetwork();
@@ -122,20 +122,19 @@ double run(){
 
     // Install sink on receiver
     PacketSinkHelper sinkHelper("ns3::TcpSocketFactory",InetSocketAddress(Ipv4Address::GetAny(), port));
-    sinkApp = sinkHelper.Install(nodes.Get(nodes.GetN()-1));
+    sinkApp = sinkHelper.Install(nodes.Get(5));
     sinkApp.Start(Seconds(0.0));
     sinkApp.Stop(Seconds(runtime));
     
     // Delay BulkSender installation and start
     Simulator::Schedule(Seconds(0.000001), [&]() mutable {
-        BulkSendHelper bulk("ns3::TcpSocketFactory",InetSocketAddress(interfaces.back().GetAddress(1), port));
+        BulkSendHelper bulk("ns3::TcpSocketFactory",InetSocketAddress(interfaces[4].GetAddress(1), port));
         bulk.SetAttribute("MaxBytes", UintegerValue(0)); 
         auto senderApp = bulk.Install(nodes.Get(0));
         senderApp.Start(Seconds(1.0));
         senderApp.Stop(Seconds(runtime));
-        Ipv4GlobalRoutingHelper::PopulateRoutingTables();
     });
-
+    Ipv4GlobalRoutingHelper::PopulateRoutingTables();
     Simulator::Stop(Seconds(runtime));
     Simulator::Run();
 
