@@ -63,6 +63,7 @@ class CustomTcp : public TcpNewReno {
                 if(slow_start){
                     slow_start = false;
                     Throughput = -getThroughput(); // Remove the slow start portion
+                    cout << " ok \n";
                 }
                 // Additive increase
                 double cwndInSegments = tcb->m_cWnd.Get() / tcb->m_segmentSize;
