@@ -24,6 +24,15 @@ Where:
 - **α**, **β**, and **γ** are tunable weighting coefficients that reflect the relative importance of **delay**, **throughput**, and **jitter** respectively.
 - All parameters may be **normalized** based on predefined scale factors to ensure comparability.
 
+### Cases for Measurement:
+
+| Case | α | β | γ |
+|------|----|----|----|
+| Delay only | 1 | 0 | 0 |
+| Delay + Throughput | 1/2 | 1/2 | 0 |
+| Delay + Jitter | 3/4 | 0 | 1/4 |
+| Delay + Throughput + Jitter | 2/5 | 2/5 | 1/5 |
+
 ---
 
 ## 🌐 2. Topologies Used for Experimentation
@@ -44,7 +53,9 @@ These topologies offer varying levels of connectivity and congestion sensitivity
 Our primary objective is to **minimize the Congestion Metric (CM)** using an **adaptive congestion window (cwnd) update strategy**, governed by:
 
 ### 🔧 Control Equation
-Δcwnd = (1 - PL) · (a / (b + cwnd)) - PL · (c · cwnd - d)
+\[
+\Delta \text{cwnd} = \left( \frac{(1 - PL) \cdot a}{b + \text{cwnd}} \right) + \left( PL \cdot (c \cdot \text{cwnd} - d) \right)
+\]
 
 Where:
 - **Δcwnd** – Change in the congestion window
@@ -60,10 +71,16 @@ Where:
 ### 📦 Case Configurations
 
 #### ➤ TCP Tahoe:
-a = 1, b = 0, c = 1, d = 1 Δcwnd = (1 / cwnd) - PL · (1 / cwnd + (cwnd - 1))
+\textbf{Tahoe:} \quad a = 1,\quad b = 0,\quad c = 1,\quad d = 1
+\[
+\Delta \text{cwnd} = \frac{1}{\text{cwnd}} - PL \times \left( \frac{1}{\text{cwnd}} + \text{cwnd} - 1 \right)
+\]
 
 #### ➤ TCP Reno:
-a = 1, b = 0, c = 0.5, d = 0 Δcwnd = (1 / cwnd) - PL · (cwnd / 2 + 1 / cwnd)
+\textbf{Reno:} \quad a = 1,\quad b = 0,\quad c = \frac{1}{2},\quad d = 0
+\[
+\Delta \text{cwnd} = \frac{1}{\text{cwnd}} - PL \times \left( \frac{1}{\text{cwnd}} + \frac{\text{cwnd}}{2} \right)
+\]
 
 ## 📈 4. Gradient‑Descent‑Driven Parameter Tuning
 
@@ -78,12 +95,21 @@ CM = α · D - β · T + γ · J
 
 2. **Estimate Gradients**:
 Using finite differences:
-∂CM/∂x ≈ (CM(x + ε) - CM(x)) / ε
+\[
+\frac{\partial \text{CM}}{\partial x} \approx \frac{\text{CM}(x + \varepsilon) - \text{CM}(x)}{\varepsilon}
+\]
 
 
 3. **Parameter Update**:
 Move in the direction of the negative gradient:
 x ← x - η · ∂CM/∂x for x ∈ {a, b, c, d}
+
+\begin{align*}
+a &\leftarrow a - \alpha \cdot \frac{\partial \text{CM}}{\partial a} \\
+b &\leftarrow b - \alpha \cdot \frac{\partial \text{CM}}{\partial b} \\
+c &\leftarrow c - \alpha \cdot \frac{\partial \text{CM}}{\partial c} \\
+d &\leftarrow d - \alpha \cdot \frac{\partial \text{CM}}{\partial d}
+\end{align*}
 
 where `η` is the learning rate.
 
