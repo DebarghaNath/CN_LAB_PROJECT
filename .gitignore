@@ -1,1 +1,5 @@
-.vscode
+# Executable
+*.exe
+
+# Windows
+.vscode/
